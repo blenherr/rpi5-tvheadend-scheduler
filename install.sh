@@ -1,37 +1,43 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
-DEAMONNAME="rpi5-tvheadend-scheduler"
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-SERVICE_FILE="$DEAMONNAME.service"
+FILENAME="tvh-scheduler"
+DIRNAME=$(dirname "$(realpath $0)")
+TEMP_DIR=$(mktemp -d)
 
-# Create service file
-echo "Create $SERVICE_FILE file:"
-echo ""
-echo "[Unit]" | sudo tee $SCRIPT_DIR"/"$SERVICE_FILE
-echo "Description=Auto poweroff Raspberry Pi 5 and wake for a recording" | sudo tee -a $SCRIPT_DIR"/"$SERVICE_FILE
-echo "After=tvheadend.service" | sudo tee -a $SCRIPT_DIR"/"$SERVICE_FILE
-echo "Requires=tvheadend.service" | sudo tee -a $SCRIPT_DIR"/"$SERVICE_FILE
-echo "" | sudo tee -a $SCRIPT_DIR"/"$SERVICE_FILE
-echo "[Service]" | sudo tee -a $SCRIPT_DIR"/"$SERVICE_FILE
-echo "Type=simple" | sudo tee -a $SCRIPT_DIR"/"$SERVICE_FILE
-echo "User=$USER" | sudo tee -a $SCRIPT_DIR"/"$SERVICE_FILE
-echo "Group=$USER" | sudo tee -a $SCRIPT_DIR"/"$SERVICE_FILE
-echo "ExecStart=/usr/bin/python "$SCRIPT_DIR"/"$DEAMONNAME".py" | sudo tee -a $SCRIPT_DIR"/"$SERVICE_FILE
-echo "Restart=on-failure" | sudo tee -a $SCRIPT_DIR"/"$SERVICE_FILE
-echo "RestartSec=10" | sudo tee -a $SCRIPT_DIR"/"$SERVICE_FILE
-echo "" | sudo tee -a $SCRIPT_DIR"/"$SERVICE_FILE
-echo "[Install]" | sudo tee -a $SCRIPT_DIR"/"$SERVICE_FILE
-echo "WantedBy=multi-user.target" | sudo tee -a $SCRIPT_DIR"/"$SERVICE_FILE
-echo ""
+# Create $TEMP_DIR/$FILENAME.service
+echo "Create $TEMP_DIR/$FILENAME.service"
+echo "[Unit]" > $TEMP_DIR/$FILENAME.service
+echo "Description=Auto poweroff Raspberry Pi 5 and wake for a recording" >> $TEMP_DIR/$FILENAME.service
+echo "After=tvheadend.service" >> $TEMP_DIR/$FILENAME.service
+echo "Requires=tvheadend.service" >> $TEMP_DIR/$FILENAME.service
+echo "" >> $TEMP_DIR/$FILENAME.service
+echo "[Service]" >> $TEMP_DIR/$FILENAME.service
+echo "Type=simple" >> $TEMP_DIR/$FILENAME.service
+echo "User=$USER" >> $TEMP_DIR/$FILENAME.service
+echo "Group=$USER" >> $TEMP_DIR/$FILENAME.service
+echo "ExecStart=/usr/bin/python $DIRNAME/$FILENAME.py" >> $TEMP_DIR/$FILENAME.service
+echo "WorkingDirectory=$DIRNAME" >> $TEMP_DIR/$FILENAME.service
+echo "Restart=on-failure" >> $TEMP_DIR/$FILENAME.service
+echo "RestartSec=10" >> $TEMP_DIR/$FILENAME.service
+echo "" >> $TEMP_DIR/$FILENAME.service
+echo "[Install]" >> $TEMP_DIR/$FILENAME.service
+echo "WantedBy=multi-user.target" >> $TEMP_DIR/$FILENAME.service
 
 # Copy service file
-echo "Copy $SERVICE_FILE to /lib/systemd/system/$SERVICE_FILE"
-sudo cp $SCRIPT_DIR"/"$SERVICE_FILE /lib/systemd/system/$SERVICE_FILE
+echo "Copy $TEMP_DIR/$FILENAME.service to /lib/systemd/system/$FILENAME.service"
+sudo cp $TEMP_DIR/$FILENAME.service /lib/systemd/system/$FILENAME.service
 
 # Enable service
-echo "Enable $DEAMONNAME service"
-sudo systemctl enable $DEAMONNAME
+echo "Enable $FILENAME.service"
+sudo systemctl enable $FILENAME.service
 
 # Start service
-echo "Start $DEAMONNAME service"
-sudo systemctl start $DEAMONNAME
+echo "Start $FILENAME.service"
+sudo systemctl start $FILENAME.service
+
+# Reload deamon
+echo "Reload deamon"
+sudo systemctl daemon-reload
+
+# Done
+echo "Done!"
