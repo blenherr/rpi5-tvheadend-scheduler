@@ -15,20 +15,6 @@ import socket
 import subprocess
 import logging
 
-# Logging
-dir_path = os.path.dirname(os.path.realpath(__file__))
-os.makedirs(dir_path + "/logs", exist_ok=True)
-now = datetime.now()
-logging.basicConfig(
-    format="%(asctime)s %(levelname)-8s %(lineno)-4d %(funcName)s(): %(message)s",
-    filename=dir_path + "/logs/%s.log" % (now.strftime("%Y_%m_%d")),
-    datefmt="%H:%M:%S",
-    level=logging.DEBUG,
-)
-LOGGER = logging.getLogger(__name__)
-LOGGER.debug("")
-LOGGER.debug("Autopoweroff python script has started")
-
 # Tvheadend server
 HOST = "localhost"
 PORT = "9981"
@@ -49,6 +35,20 @@ PRE_SCHEDULE_TIME = 120
 
 # Sleep time in seconds (Sleep this script for the specified time).
 SLEEP_TIME = 60
+
+# Logging
+dir_path = os.path.dirname(os.path.realpath(__file__))
+os.makedirs(dir_path + "/logs", exist_ok=True)
+now = datetime.now()
+logging.basicConfig(
+    format="%(asctime)s %(levelname)-8s %(lineno)-4d %(funcName)s(): %(message)s",
+    filename=dir_path + "/logs/%s.log" % (now.strftime("%Y_%m_%d")),
+    datefmt="%H:%M:%S",
+    level=logging.DEBUG,
+)
+LOGGER = logging.getLogger(__name__)
+LOGGER.debug("")
+LOGGER.debug("Autopoweroff python script has started")
 
 
 def uptime():
@@ -212,5 +212,8 @@ def main():
 
 if __name__ == "__main__":
     while True:
-        main()
-        time.sleep(SLEEP_TIME)
+        try:
+            main()
+            time.sleep(SLEEP_TIME)
+        except Exception as e:
+            LOGGER.error(e)
