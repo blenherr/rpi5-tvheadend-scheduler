@@ -44,7 +44,7 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)-8s %(lineno)-4d %(funcName)s(): %(message)s",
     filename=dir_path + "/logs/%s.log" % (now.strftime("%Y_%m_%d")),
     datefmt="%H:%M:%S",
-    level=logging.DEBUG,
+    level=logging.ERROR,
 )
 LOGGER = logging.getLogger(__name__)
 LOGGER.debug("")
