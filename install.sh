@@ -33,7 +33,7 @@ sudo systemctl enable $FILENAME.service
 
 # Start service
 echo "Start $FILENAME.service"
-sudo systemctl start $FILENAME.service
+sudo systemctl restart $FILENAME.service
 
 # Reload deamon
 echo "Reload deamon"
