@@ -1,4 +1,2 @@
 # Ignore log folder
 logs/
-# Ignore log files
-#logs/*.log
